@@ -1,22 +1,47 @@
 import React, { useState } from 'react'
 
 function AuthPage() {
-  const [step, setStep] = useState('auth') // 'auth' | 'role'
+  const [step, setStep] = useState('auth') // 'auth' | 'role' | 'forgot'
   const [isLogin, setIsLogin] = useState(true)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: ''
+    password: '',
+    confirmPassword: ''
   })
+  const [forgotEmail, setForgotEmail] = useState('')
+  const [forgotSent, setForgotSent] = useState(false)
 
   const handleAuthSubmit = (e) => {
     e.preventDefault()
+    
+    if (!isLogin && formData.password !== formData.confirmPassword) {
+      alert('Passwords do not match!')
+      return
+    }
+    
     // Simulate successful auth, move to role selection
     setStep('role')
   }
 
   const handleRoleSelect = (role) => {
     alert(`${role === 'teacher' ? 'Teacher' : 'Student'} flow coming soon!`)
+  }
+
+  const handleForgotPassword = (e) => {
+    e.preventDefault()
+    if (!forgotEmail) {
+      alert('Please enter your email address')
+      return
+    }
+    // Simulate sending reset email
+    setForgotSent(true)
+  }
+
+  const resetAuth = () => {
+    setStep('auth')
+    setForgotSent(false)
+    setForgotEmail('')
   }
 
   return (
@@ -210,6 +235,58 @@ function AuthPage() {
                 />
               </div>
 
+              {!isLogin && (
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: '#374151',
+                    marginBottom: '8px'
+                  }}>
+                    Confirm Password
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="Confirm your password"
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '14px 16px',
+                      fontSize: '16px',
+                      border: '2px solid #e5e7eb',
+                      borderRadius: '12px',
+                      outline: 'none',
+                      transition: 'border-color 0.3s'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                    onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+                  />
+                </div>
+              )}
+
+              {isLogin && (
+                <div style={{ textAlign: 'right', marginTop: '-8px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setStep('forgot')}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#3b82f6',
+                      fontSize: '13px',
+                      cursor: 'pointer',
+                      fontWeight: '500'
+                    }}
+                    onMouseOver={(e) => e.target.style.textDecoration = 'underline'}
+                    onMouseOut={(e) => e.target.style.textDecoration = 'none'}
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+              )}
+
               <button
                 type="submit"
                 style={{
@@ -243,7 +320,10 @@ function AuthPage() {
               <p style={{ color: '#6b7280', fontSize: '14px' }}>
                 {isLogin ? "Don't have an account? " : 'Already have an account? '}
                 <button
-                  onClick={() => setIsLogin(!isLogin)}
+                  onClick={() => {
+                    setIsLogin(!isLogin)
+                    setFormData({ ...formData, confirmPassword: '' })
+                  }}
                   style={{
                     background: 'none',
                     border: 'none',
@@ -261,7 +341,203 @@ function AuthPage() {
             {/* Footer */}
             <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid #e5e7eb', textAlign: 'center' }}>
               <p style={{ color: '#9ca3af', fontSize: '13px' }}>
-                
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Forgot Password Step */}
+        {step === 'forgot' && (
+          <div style={{
+            background: 'white',
+            borderRadius: '24px',
+            padding: '40px',
+            maxWidth: '450px',
+            width: '100%',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
+            animation: 'fadeInUp 0.5s ease-out'
+          }}>
+            {/* Back button */}
+            <button
+              onClick={resetAuth}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#6b7280',
+                cursor: 'pointer',
+                fontSize: '14px',
+                marginBottom: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+            >
+              ← Back to Sign In
+            </button>
+
+            {/* Icon */}
+            <div style={{
+              width: '70px',
+              height: '70px',
+              background: 'linear-gradient(135deg, #1e40af, #3b82f6)',
+              borderRadius: '18px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 20px',
+              boxShadow: '0 15px 35px rgba(30, 64, 175, 0.25)'
+            }}>
+              <span style={{ fontSize: '35px' }}>🔑</span>
+            </div>
+
+            {!forgotSent ? (
+              <>
+                <h2 style={{
+                  fontSize: '26px',
+                  fontWeight: '700',
+                  color: '#1f2937',
+                  textAlign: 'center',
+                  marginBottom: '8px'
+                }}>
+                  Forgot Password?
+                </h2>
+                <p style={{
+                  color: '#6b7280',
+                  textAlign: 'center',
+                  marginBottom: '30px',
+                  fontSize: '14px',
+                  lineHeight: '1.5'
+                }}>
+                  Enter your email address and we'll send you a link to reset your password.
+                </p>
+
+                <form onSubmit={handleForgotPassword} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                  <div>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: '#374151',
+                      marginBottom: '8px'
+                    }}>
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      placeholder="Enter your email"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '14px 16px',
+                        fontSize: '16px',
+                        border: '2px solid #e5e7eb',
+                        borderRadius: '12px',
+                        outline: 'none',
+                        transition: 'border-color 0.3s'
+                      }}
+                      onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                      onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    style={{
+                      width: '100%',
+                      padding: '16px',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      color: 'white',
+                      background: 'linear-gradient(135deg, #1e40af, #3b82f6)',
+                      border: 'none',
+                      borderRadius: '12px',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s',
+                      boxShadow: '0 4px 15px rgba(30, 64, 175, 0.3)'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.transform = 'translateY(-2px)'
+                      e.target.style.boxShadow = '0 6px 20px rgba(30, 64, 175, 0.4)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.transform = 'translateY(0)'
+                      e.target.style.boxShadow = '0 4px 15px rgba(30, 64, 175, 0.3)'
+                    }}
+                  >
+                    Send Reset Link
+                  </button>
+                </form>
+              </>
+            ) : (
+              <>
+                <h2 style={{
+                  fontSize: '26px',
+                  fontWeight: '700',
+                  color: '#1f2937',
+                  textAlign: 'center',
+                  marginBottom: '8px'
+                }}>
+                  Check Your Email
+                </h2>
+                <p style={{
+                  color: '#6b7280',
+                  textAlign: 'center',
+                  marginBottom: '30px',
+                  fontSize: '14px',
+                  lineHeight: '1.5'
+                }}>
+                  We've sent a password reset link to <strong>{forgotEmail}</strong>. 
+                  Please check your inbox and click the link to reset your password.
+                </p>
+
+                <div style={{
+                  background: '#eff6ff',
+                  border: '1px solid #bfdbfe',
+                  borderRadius: '12px',
+                  padding: '16px',
+                  marginBottom: '20px',
+                  textAlign: 'center'
+                }}>
+                  <span style={{ fontSize: '24px' }}>📧</span>
+                  <p style={{
+                    color: '#3b82f6',
+                    fontSize: '14px',
+                    marginTop: '8px'
+                  }}>
+                    Didn't receive the email? Check your spam folder or try again.
+                  </p>
+                </div>
+
+                <button
+                  onClick={resetAuth}
+                  style={{
+                    width: '100%',
+                    padding: '16px',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    color: '#1e40af',
+                    background: 'transparent',
+                    border: '2px solid #1e40af',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.background = '#eff6ff'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.background = 'transparent'
+                  }}
+                >
+                  Back to Sign In
+                </button>
+              </>
+            )}
+
+            {/* Footer */}
+            <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid #e5e7eb', textAlign: 'center' }}>
+              <p style={{ color: '#9ca3af', fontSize: '13px' }}>
               </p>
             </div>
           </div>
