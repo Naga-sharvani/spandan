@@ -917,14 +917,13 @@ function RoomDetailPage() {
         options: questionData.options,
         timeToAnswer: questionData.timeToAnswer || roomSettings.timeToAnswer || 30,
         points: questionData.points || roomSettings.points || 100,
-        tags: questionBankTagsInput.split(',').map(tag => tag.trim()).filter(Boolean)
+        tags: questionData.tags || questionBankTagsInput.split(',').map(tag => tag.trim()).filter(Boolean)
       }
 
       const data = await saveQuestionToBank(payload)
       if (data.success) {
         setQuestionBankTagsInput('')
         loadQuestionBank(questionBankSearch)
-        alert('Question saved to your bank')
       } else {
         alert(data.error || 'Failed to save question to bank')
       }
@@ -1732,6 +1731,7 @@ function RoomDetailPage() {
           isOpen={showCreateQuestion}
           onClose={() => setShowCreateQuestion(false)}
           onLaunch={handleCreateQuestion}
+          onSaveToBank={handleSaveQuestionToBank}
         />
       )}
 
